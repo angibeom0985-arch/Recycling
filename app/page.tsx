@@ -8,6 +8,7 @@ import LocationSettings from '@/components/LocationSettings';
 import ItemSearch from '@/components/ItemSearch';
 import NotificationSettings from '@/components/NotificationSettings';
 import LargeWasteLink from '@/components/LargeWasteLink';
+import ExitConfirmDialog from '@/components/ExitConfirmDialog';
 
 interface RecyclingData {
   type: string;
@@ -24,6 +25,8 @@ export default function Home() {
     width: number;
     height: number;
   }>({ width: 0, height: 0 });
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [backPressCount, setBackPressCount] = useState(0);
 
   const recyclingSchedule: RecyclingData[] = [
     {
@@ -104,6 +107,46 @@ export default function Home() {
     setCurrentDay(days[today]);
   }, []);
 
+  // 뒤로가기 감지 (브라우저 히스토리)
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      e.preventDefault();
+      setShowExitDialog(true);
+      // 히스토리를 다시 푸시하여 뒤로가기 방지
+      window.history.pushState(null, '', window.location.href);
+    };
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+
+    // 초기 히스토리 상태 추가
+    window.history.pushState(null, '', window.location.href);
+    
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
+  const handleExitConfirm = () => {
+    setShowExitDialog(false);
+    // 실제 앱 종료 (PWA의 경우)
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      window.close();
+    }
+  };
+
+  const handleExitCancel = () => {
+    setShowExitDialog(false);
+  };
+
   const getTodayRecycling = () => {
     return recyclingSchedule.find((item) => item.day === currentDay);
   };
@@ -118,26 +161,33 @@ export default function Home() {
 
   return (
     <>
+      {/* 종료 확인 다이얼로그 with 광고 */}
+      <ExitConfirmDialog
+        isOpen={showExitDialog}
+        onConfirm={handleExitConfirm}
+        onCancel={handleExitCancel}
+      />
+
       {/* 품목 검색 버튼 (우측 하단 위) */}
       <ItemSearch />
 
       {/* 알림 설정 버튼 (우측 하단) */}
       <NotificationSettings />
 
-      <main className="min-h-screen w-full p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8 pb-safe pb-24">
+      <main className="min-h-screen w-full p-2 xs:p-3 sm:p-4 md:p-5 lg:p-6 xl:p-8 pb-safe pb-20 landscape:py-2 portrait:py-4">
         <div className="max-w-7xl mx-auto">
-          {/* 헤더 - 모바일 최적화 */}
-          <div className="text-center mb-3 xs:mb-4 sm:mb-6 md:mb-8">
-            <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 xs:mb-2 sm:mb-3 drop-shadow-lg">
+          {/* 헤더 - 반응형 최적화 */}
+          <div className="text-center mb-2 xs:mb-3 sm:mb-4 md:mb-5 lg:mb-6 landscape:mb-2">
+            <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 xs:mb-1.5 sm:mb-2 md:mb-2.5 drop-shadow-lg landscape:text-2xl landscape:mb-1">
               ♻️ 분리수거 알리미
             </h1>
-            <p className="text-xs xs:text-sm sm:text-base md:text-lg text-white/90">
+            <p className="text-xs xs:text-sm sm:text-base md:text-lg text-white/90 landscape:text-sm">
               우리 동네 분리수거 일정을 확인하세요
             </p>
           </div>
 
           {/* 1. 지역 설정 버튼 */}
-          <div className="mb-3 xs:mb-4 sm:mb-5">
+          <div className="mb-2 xs:mb-3 sm:mb-4 md:mb-5">
             <LocationSettings />
           </div>
 
@@ -145,12 +195,12 @@ export default function Home() {
           <NotificationCenter message={getTodayNotification()} recyclingItem={getTodayRecycling()} />
 
           {/* 3. 대형 폐기물 신고 버튼 */}
-          <div className="mb-3 xs:mb-4 sm:mb-5">
+          <div className="mb-2 xs:mb-3 sm:mb-4 md:mb-5">
             <LargeWasteLink />
           </div>
 
-          {/* 모바일 우선 레이아웃 */}
-          <div className="flex flex-col gap-3 xs:gap-4 sm:gap-5 md:gap-6">
+          {/* 반응형 레이아웃 */}
+          <div className="flex flex-col gap-2 xs:gap-3 sm:gap-4 md:gap-5 landscape:gap-2">
             {/* 달력과 상세 정보 */}
             <div className="w-full">
               <ScheduleCalendar recyclingSchedule={recyclingSchedule} />
