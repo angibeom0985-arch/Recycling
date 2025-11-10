@@ -17,16 +17,16 @@ export const RecyclingItem: React.FC<RecyclingItemProps> = ({
 }) => {
   return (
     <div
-      className={`flex flex-col items-center justify-center p-3 xs:p-4 sm:p-5 md:p-6 rounded-lg sm:rounded-xl ${color} shadow-lg hover:shadow-xl transition-shadow duration-300 w-full h-full`}
+      className={`flex flex-col items-center justify-center p-2 xs:p-3 sm:p-4 md:p-5 rounded-lg sm:rounded-xl ${color} shadow-lg hover:shadow-xl active:scale-95 transition-all duration-200 w-full h-full touch-manipulation`}
     >
-      <div className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl mb-2 xs:mb-3 sm:mb-4">{icon}</div>
-      <h3 className="text-sm xs:text-base sm:text-lg md:text-xl font-bold text-white text-center mb-1 xs:mb-2">
+      <div className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl mb-1 xs:mb-2 sm:mb-3">{icon}</div>
+      <h3 className="text-xs xs:text-sm sm:text-base md:text-lg font-bold text-white text-center mb-1">
         {type}
       </h3>
-      <p className="text-xs xs:text-sm sm:text-base text-white/90 text-center mb-2 xs:mb-3 line-clamp-2">
+      <p className="text-[10px] xs:text-xs sm:text-sm text-white/90 text-center mb-1 xs:mb-2 line-clamp-1">
         {description}
       </p>
-      <div className="text-xs xs:text-sm sm:text-base font-semibold text-white bg-black/20 px-2 xs:px-3 sm:px-4 py-1 xs:py-1.5 sm:py-2 rounded-full mt-auto">
+      <div className="text-[10px] xs:text-xs sm:text-sm font-semibold text-white bg-black/20 px-2 py-0.5 xs:py-1 rounded-full mt-auto">
         {day}
       </div>
     </div>

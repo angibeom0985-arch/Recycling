@@ -113,14 +113,14 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen w-full p-3 xs:p-4 sm:p-5 md:p-6 lg:p-8">
+    <main className="min-h-screen w-full p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8 pb-safe">
       <div className="max-w-7xl mx-auto">
-        {/* 헤더 */}
-        <div className="text-center mb-4 xs:mb-6 sm:mb-8 md:mb-10">
-          <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 xs:mb-3 sm:mb-4 drop-shadow-lg">
+        {/* 헤더 - 모바일 최적화 */}
+        <div className="text-center mb-3 xs:mb-4 sm:mb-6 md:mb-8">
+          <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 xs:mb-2 sm:mb-3 drop-shadow-lg">
             ♻️ 분리수거 알리미
           </h1>
-          <p className="text-sm xs:text-base sm:text-lg md:text-xl text-white/90">
+          <p className="text-xs xs:text-sm sm:text-base md:text-lg text-white/90">
             자신의 지역 분리수거 일정을 확인하세요
           </p>
         </div>
@@ -128,14 +128,10 @@ export default function Home() {
         {/* 알림 배너 */}
         <NotificationCenter message={getTodayNotification()} recyclingItem={getTodayRecycling()} />
 
-        {/* 레이아웃: 포트레이트는 단일 열, 랜드스케이프는 2열 */}
-        <div className={`${isPortrait ? 'flex flex-col' : 'grid grid-cols-2'} gap-4 xs:gap-5 sm:gap-6 md:gap-8`}>
-          {/* 왼쪽: 분리수거 스케줄 그리드 */}
-          <div
-            className={`${
-              isPortrait ? 'w-full' : 'col-span-1'
-            } grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-2 xs:gap-3 sm:gap-4 md:gap-5`}
-          >
+        {/* 모바일 우선 레이아웃 */}
+        <div className="flex flex-col gap-3 xs:gap-4 sm:gap-5 md:gap-6">
+          {/* 분리수거 스케줄 그리드 - 모바일 2열, 태블릿+ 3열 */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 xs:gap-3 sm:gap-4">
             {recyclingSchedule.map((item) => (
               <div key={item.type} className="aspect-square">
                 <RecyclingItem {...item} />
@@ -143,8 +139,8 @@ export default function Home() {
             ))}
           </div>
 
-          {/* 오른쪽: 달력과 상세 정보 */}
-          <div className={`${isPortrait ? 'w-full' : 'col-span-1'} flex flex-col gap-4 xs:gap-5 sm:gap-6`}>
+          {/* 달력과 상세 정보 */}
+          <div className="w-full">
             <ScheduleCalendar recyclingSchedule={recyclingSchedule} />
           </div>
         </div>
