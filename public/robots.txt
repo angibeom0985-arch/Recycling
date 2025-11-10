@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://recycling.money-hotissue.com/sitemap.xml
