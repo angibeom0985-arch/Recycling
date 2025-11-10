@@ -26,17 +26,21 @@ export default function LocationSettings() {
   });
   const [schedule, setSchedule] = useState<RecyclingSchedule | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [hasLocation, setHasLocation] = useState(false);
 
   // 로컬스토리지에서 위치 정보 불러오기
   useEffect(() => {
     const savedLocation = localStorage.getItem('userLocation');
     if (savedLocation) {
-      setLocation(JSON.parse(savedLocation));
+      const parsed = JSON.parse(savedLocation);
+      setLocation(parsed);
+      setHasLocation(!!parsed.dong);
     }
   }, []);
 
   const saveLocation = () => {
     localStorage.setItem('userLocation', JSON.stringify(location));
+    setHasLocation(!!location.dong);
     // 실제로는 API를 호출하여 해당 지역의 배출 일정을 가져와야 합니다
     // 여기서는 예시 데이터를 사용합니다
     const exampleSchedule: RecyclingSchedule = {
@@ -55,12 +59,21 @@ export default function LocationSettings() {
 
   return (
     <>
-      {/* 위치 설정 버튼 */}
+      {/* 위치 설정 버튼 - 가로로 넓게 */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed top-4 right-4 z-50 bg-white/20 backdrop-blur-md text-white px-3 xs:px-4 py-2 rounded-lg shadow-lg hover:bg-white/30 transition-all active:scale-95 touch-manipulation"
+        className="w-full bg-white/20 backdrop-blur-md text-white px-4 py-3 rounded-xl shadow-lg hover:bg-white/30 transition-all active:scale-[0.98] touch-manipulation flex items-center justify-between"
       >
-        <span className="text-xs xs:text-sm">📍 {location.dong || '지역 설정'}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-base xs:text-lg">📍</span>
+          <div className="text-left">
+            <div className="text-xs text-white/70">지역 설정</div>
+            <div className="text-sm xs:text-base font-semibold">
+              {location.dong ? `${location.region} ${location.district} ${location.dong}` : '지역을 선택해주세요'}
+            </div>
+          </div>
+        </div>
+        <span className="text-xl">›</span>
       </button>
 
       {/* 모달 */}

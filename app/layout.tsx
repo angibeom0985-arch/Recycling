@@ -32,6 +32,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko" suppressHydrationWarning>
+      <head>
+        <script 
+          async 
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2686975437928535" 
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>
         <div className="w-screen h-screen overflow-auto">
           {children}

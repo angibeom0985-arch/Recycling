@@ -118,9 +118,6 @@ export default function Home() {
 
   return (
     <>
-      {/* 위치 설정 버튼 (우측 상단) */}
-      <LocationSettings />
-
       {/* 품목 검색 버튼 (우측 하단 위) */}
       <ItemSearch />
 
@@ -130,7 +127,7 @@ export default function Home() {
       <main className="min-h-screen w-full p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8 pb-safe pb-24">
         <div className="max-w-7xl mx-auto">
           {/* 헤더 - 모바일 최적화 */}
-          <div className="text-center mb-3 xs:mb-4 sm:mb-6 md:mb-8 mt-12 xs:mt-0">
+          <div className="text-center mb-3 xs:mb-4 sm:mb-6 md:mb-8">
             <h1 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1 xs:mb-2 sm:mb-3 drop-shadow-lg">
               ♻️ 분리수거 알리미
             </h1>
@@ -139,25 +136,21 @@ export default function Home() {
             </p>
           </div>
 
-          {/* 알림 배너 */}
+          {/* 1. 지역 설정 버튼 */}
+          <div className="mb-3 xs:mb-4 sm:mb-5">
+            <LocationSettings />
+          </div>
+
+          {/* 2. 오늘의 배출 알림 */}
           <NotificationCenter message={getTodayNotification()} recyclingItem={getTodayRecycling()} />
 
-          {/* 대형 폐기물 신고 버튼 */}
+          {/* 3. 대형 폐기물 신고 버튼 */}
           <div className="mb-3 xs:mb-4 sm:mb-5">
             <LargeWasteLink />
           </div>
 
           {/* 모바일 우선 레이아웃 */}
           <div className="flex flex-col gap-3 xs:gap-4 sm:gap-5 md:gap-6">
-            {/* 분리수거 스케줄 그리드 - 모바일 2열, 태블릿+ 3열 */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 xs:gap-3 sm:gap-4">
-              {recyclingSchedule.map((item) => (
-                <div key={item.type} className="aspect-square">
-                  <RecyclingItem {...item} />
-                </div>
-              ))}
-            </div>
-
             {/* 달력과 상세 정보 */}
             <div className="w-full">
               <ScheduleCalendar recyclingSchedule={recyclingSchedule} />
