@@ -364,7 +364,7 @@ export default function LargeWastePage() {
               닫기
             </button>
             <button
-              onClick={() => window.open(userRegion.website, '_blank')}
+              onClick={() => window.location.href = userRegion.website}
               className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl font-semibold hover:from-purple-600 hover:to-indigo-600 active:scale-95 transition-all"
             >
               신고 바로가기 →

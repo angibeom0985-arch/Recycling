@@ -10,6 +10,7 @@ import NotificationSettings from '@/components/NotificationSettings';
 import LargeWasteLink from '@/components/LargeWasteLink';
 import RecyclingGuideButton from '@/components/RecyclingGuideButton';
 import ExitConfirmDialog from '@/components/ExitConfirmDialog';
+import { getRegionalSchedule, getTodayItems } from '@/data/regionalRecyclingData';
 
 interface RecyclingData {
   type: string;
@@ -21,6 +22,8 @@ interface RecyclingData {
 
 export default function Home() {
   const [currentDay, setCurrentDay] = useState<string>('');
+  const [userRegion, setUserRegion] = useState<string>('기본');
+  const [recyclingSchedule, setRecyclingSchedule] = useState<RecyclingData[]>([]);
   const [isPortrait, setIsPortrait] = useState<boolean>(true);
   const [screenSize, setScreenSize] = useState<{
     width: number;
@@ -29,57 +32,60 @@ export default function Home() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [backPressCount, setBackPressCount] = useState(0);
 
-  const recyclingSchedule: RecyclingData[] = [
-    {
-      type: '종이류',
-      day: '월요일',
-      icon: '📰',
-      color: 'bg-gradient-to-br from-blue-400 to-blue-600',
-      description: '신문, 잡지, 상자',
-    },
-    {
-      type: '플라스틱',
-      day: '화요일',
-      icon: '🥤',
-      color: 'bg-gradient-to-br from-green-400 to-green-600',
-      description: '음료수병, 용기',
-    },
-    {
-      type: '유리',
-      day: '수요일',
-      icon: '🍾',
-      color: 'bg-gradient-to-br from-cyan-400 to-cyan-600',
-      description: '유리병, 유리 제품',
-    },
-    {
-      type: '금속',
-      day: '목요일',
-      icon: '🥫',
-      color: 'bg-gradient-to-br from-yellow-400 to-yellow-600',
-      description: '캔, 금속 제품',
-    },
-    {
-      type: '의류',
-      day: '금요일',
-      icon: '👕',
-      color: 'bg-gradient-to-br from-pink-400 to-pink-600',
-      description: '의류, 신발',
-    },
-    {
-      type: '음식물',
-      day: '토요일',
-      icon: '🍌',
-      color: 'bg-gradient-to-br from-orange-400 to-orange-600',
-      description: '남은 음식, 찌꺼기',
-    },
-    {
-      type: '일반쓰레기',
-      day: '일요일',
-      icon: '🗑️',
-      color: 'bg-gradient-to-br from-gray-400 to-gray-600',
-      description: '분류되지 않는 쓰레기',
-    },
-  ];
+  // 아이콘 매핑
+  const iconMap: { [key: string]: { icon: string; color: string } } = {
+    '종이류': { icon: '📰', color: 'bg-gradient-to-br from-blue-400 to-blue-600' },
+    '플라스틱': { icon: '🥤', color: 'bg-gradient-to-br from-green-400 to-green-600' },
+    '유리': { icon: '🍾', color: 'bg-gradient-to-br from-cyan-400 to-cyan-600' },
+    '금속': { icon: '🥫', color: 'bg-gradient-to-br from-yellow-400 to-yellow-600' },
+    '비닐': { icon: '🛍️', color: 'bg-gradient-to-br from-purple-400 to-purple-600' },
+    '음식물': { icon: '�', color: 'bg-gradient-to-br from-orange-400 to-orange-600' },
+    '일반쓰레기': { icon: '🗑️', color: 'bg-gradient-to-br from-gray-400 to-gray-600' },
+  };
+
+  // 지역 설정 로드
+  useEffect(() => {
+    const savedLocation = localStorage.getItem('userLocation');
+    if (savedLocation) {
+      const location = JSON.parse(savedLocation);
+      setUserRegion(location.region || '기본');
+    }
+  }, []);
+
+  // 지역별 일정 로드
+  useEffect(() => {
+    const regionalData = getRegionalSchedule(userRegion);
+    const schedule: RecyclingData[] = [];
+    
+    Object.entries(regionalData.items).forEach(([itemName, itemData]) => {
+      const iconData = iconMap[itemName] || { icon: '�', color: 'bg-gradient-to-br from-gray-400 to-gray-600' };
+      schedule.push({
+        type: itemName,
+        day: itemData.days.join(', '),
+        icon: iconData.icon,
+        color: iconData.color,
+        description: itemData.description,
+      });
+    });
+    
+    setRecyclingSchedule(schedule);
+  }, [userRegion]);
+
+  // 지역 변경 이벤트 리스너
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const savedLocation = localStorage.getItem('userLocation');
+      if (savedLocation) {
+        const location = JSON.parse(savedLocation);
+        setUserRegion(location.region || '기본');
+      }
+    };
+
+    window.addEventListener('locationChanged', handleLocationChange);
+    return () => {
+      window.removeEventListener('locationChanged', handleLocationChange);
+    };
+  }, []);
 
   const handleResize = useCallback(() => {
     if (typeof window !== 'undefined') {
@@ -149,15 +155,25 @@ export default function Home() {
   };
 
   const getTodayRecycling = () => {
-    return recyclingSchedule.find((item) => item.day === currentDay);
+    const todayItems = getTodayItems(userRegion);
+    if (todayItems.length > 0) {
+      // 오늘 배출 가능한 첫 번째 품목 반환
+      const firstItem = todayItems[0];
+      return recyclingSchedule.find((item) => item.type === firstItem);
+    }
+    return undefined;
   };
 
   const getTodayNotification = () => {
-    const today = getTodayRecycling();
-    if (today) {
-      return `오늘은 ${today.type} 배출일입니다!`;
+    const todayItems = getTodayItems(userRegion);
+    if (todayItems.length > 0) {
+      if (todayItems.length === 1) {
+        return `오늘은 ${todayItems[0]} 배출일입니다!`;
+      } else {
+        return `오늘은 ${todayItems.join(', ')} 배출일입니다!`;
+      }
     }
-    return '';
+    return '오늘은 배출일이 아닙니다.';
   };
 
   return (

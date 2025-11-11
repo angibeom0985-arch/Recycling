@@ -39,22 +39,21 @@ export default function LocationSettings() {
   }, []);
 
   const saveLocation = () => {
+    if (!location.region || !location.district || !location.dong) {
+      alert('모든 정보를 입력해주세요!');
+      return;
+    }
+    
     localStorage.setItem('userLocation', JSON.stringify(location));
     setHasLocation(!!location.dong);
-    // 실제로는 API를 호출하여 해당 지역의 배출 일정을 가져와야 합니다
-    // 여기서는 예시 데이터를 사용합니다
-    const exampleSchedule: RecyclingSchedule = {
-      plastic: ['화요일', '금요일'],
-      vinyl: ['화요일', '금요일'],
-      glass: ['수요일'],
-      paper: ['월요일', '목요일'],
-      can: ['수요일'],
-      food: ['월요일', '수요일', '금요일'],
-      general: ['화요일', '목요일', '토요일'],
-    };
-    setSchedule(exampleSchedule);
     setIsOpen(false);
-    alert('지역 설정이 저장되었습니다!');
+    
+    // 지역 변경 이벤트 발생
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('locationChanged'));
+    }
+    
+    alert(`지역 설정이 저장되었습니다!\n${location.region} ${location.district} ${location.dong}`);
   };
 
   return (
