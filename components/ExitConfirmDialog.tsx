@@ -26,19 +26,6 @@ export default function ExitConfirmDialog({ isOpen, onConfirm, onCancel }: ExitC
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9999] flex items-center justify-center p-4 animate-in fade-in">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-in zoom-in-95 slide-in-from-bottom-4">
-        {/* 광고 영역 */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-3 border-b">
-          <p className="text-[10px] text-gray-500 text-center mb-2">광고</p>
-          <ins
-            className="adsbygoogle"
-            style={{ display: 'block' }}
-            data-ad-client="ca-pub-2686975437928535"
-            data-ad-slot="5928627481"
-            data-ad-format="auto"
-            data-full-width-responsive="true"
-          />
-        </div>
-
         {/* 확인 메시지 */}
         <div className="p-5 xs:p-6 text-center">
           <div className="text-4xl xs:text-5xl mb-3 xs:mb-4">👋</div>
@@ -48,6 +35,21 @@ export default function ExitConfirmDialog({ isOpen, onConfirm, onCancel }: ExitC
           <p className="text-xs xs:text-sm text-gray-600">
             다음에 또 만나요!
           </p>
+        </div>
+
+        {/* 광고 영역 */}
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-3 mx-4 rounded-lg mb-4">
+          <p className="text-[10px] text-gray-500 text-center mb-2">광고</p>
+          <div className="flex justify-center">
+            <ins
+              className="adsbygoogle"
+              style={{ display: 'block', textAlign: 'center' }}
+              data-ad-client="ca-pub-2686975437928535"
+              data-ad-slot="5928627481"
+              data-ad-format="auto"
+              data-full-width-responsive="true"
+            />
+          </div>
         </div>
 
         {/* 버튼 영역 */}
