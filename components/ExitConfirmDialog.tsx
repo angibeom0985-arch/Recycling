@@ -13,8 +13,15 @@ export default function ExitConfirmDialog({ isOpen, onConfirm, onCancel }: ExitC
     if (isOpen && typeof window !== 'undefined') {
       // 광고 로드
       try {
-        (window as any).adsbygoogle = (window as any).adsbygoogle || [];
-        (window as any).adsbygoogle.push({});
+        // AdSense 스크립트가 로드될 때까지 대기
+        const loadAd = () => {
+          if ((window as any).adsbygoogle) {
+            (window as any).adsbygoogle.push({});
+          }
+        };
+        
+        // 약간의 지연 후 광고 로드
+        setTimeout(loadAd, 100);
       } catch (e) {
         console.error('AdSense error:', e);
       }
@@ -40,14 +47,18 @@ export default function ExitConfirmDialog({ isOpen, onConfirm, onCancel }: ExitC
         {/* 광고 영역 */}
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-3 mx-4 rounded-lg mb-4">
           <p className="text-[10px] text-gray-500 text-center mb-2">광고</p>
-          <div className="flex justify-center">
+          <div className="flex justify-center min-h-[100px]">
             <ins
               className="adsbygoogle"
-              style={{ display: 'block', textAlign: 'center' }}
+              style={{ 
+                display: 'inline-block',
+                width: '100%',
+                minHeight: '100px'
+              }}
               data-ad-client="ca-pub-2686975437928535"
               data-ad-slot="5928627481"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
+              data-ad-format="fluid"
+              data-ad-layout-key="-fb+5w+4e-db+86"
             />
           </div>
         </div>
