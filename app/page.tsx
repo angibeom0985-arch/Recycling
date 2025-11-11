@@ -8,6 +8,7 @@ import LocationSettings from '@/components/LocationSettings';
 import ItemSearch from '@/components/ItemSearch';
 import NotificationSettings from '@/components/NotificationSettings';
 import LargeWasteLink from '@/components/LargeWasteLink';
+import RecyclingGuideButton from '@/components/RecyclingGuideButton';
 import ExitConfirmDialog from '@/components/ExitConfirmDialog';
 
 interface RecyclingData {
@@ -194,7 +195,12 @@ export default function Home() {
           {/* 2. 오늘의 배출 알림 */}
           <NotificationCenter message={getTodayNotification()} recyclingItem={getTodayRecycling()} />
 
-          {/* 3. 대형 폐기물 신고 버튼 */}
+          {/* 3. 분리수거 완벽 가이드 버튼 */}
+          <div className="mb-2 xs:mb-3 sm:mb-4 md:mb-5">
+            <RecyclingGuideButton />
+          </div>
+
+          {/* 4. 대형 폐기물 신고 버튼 */}
           <div className="mb-2 xs:mb-3 sm:mb-4 md:mb-5">
             <LargeWasteLink />
           </div>
