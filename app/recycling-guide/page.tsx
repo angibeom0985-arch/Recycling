@@ -234,7 +234,7 @@ export default function RecyclingGuidePage() {
               </h3>
               <ol className="space-y-2 text-xs xs:text-sm text-gray-800 list-decimal list-inside">
                 <li><strong>거주 형태 확인:</strong> 아파트(관리사무소) vs 단독주택(구청)</li>
-                <li><strong>관할 구청 웹사이트:</strong> '청소', '폐기물', '분리수거' 검색</li>
+                <li><strong>관할 구청 웹사이트:</strong> &apos;청소&apos;, &apos;폐기물&apos;, &apos;분리수거&apos; 검색</li>
                 <li><strong>대표 전화 문의:</strong> 청소과(환경과)에 주소지 말하고 문의</li>
               </ol>
             </section>

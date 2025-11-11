@@ -32,17 +32,6 @@ export default function Home() {
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [backPressCount, setBackPressCount] = useState(0);
 
-  // 아이콘 매핑
-  const iconMap: { [key: string]: { icon: string; color: string } } = {
-    '종이류': { icon: '📰', color: 'bg-gradient-to-br from-blue-400 to-blue-600' },
-    '플라스틱': { icon: '🥤', color: 'bg-gradient-to-br from-green-400 to-green-600' },
-    '유리': { icon: '🍾', color: 'bg-gradient-to-br from-cyan-400 to-cyan-600' },
-    '금속': { icon: '🥫', color: 'bg-gradient-to-br from-yellow-400 to-yellow-600' },
-    '비닐': { icon: '🛍️', color: 'bg-gradient-to-br from-purple-400 to-purple-600' },
-    '음식물': { icon: '�', color: 'bg-gradient-to-br from-orange-400 to-orange-600' },
-    '일반쓰레기': { icon: '🗑️', color: 'bg-gradient-to-br from-gray-400 to-gray-600' },
-  };
-
   // 지역 설정 로드
   useEffect(() => {
     const savedLocation = localStorage.getItem('userLocation');
@@ -57,8 +46,19 @@ export default function Home() {
     const regionalData = getRegionalSchedule(userRegion);
     const schedule: RecyclingData[] = [];
     
+    // 아이콘 매핑
+    const iconMap: { [key: string]: { icon: string; color: string } } = {
+      '종이류': { icon: '📰', color: 'bg-gradient-to-br from-blue-400 to-blue-600' },
+      '플라스틱': { icon: '🥤', color: 'bg-gradient-to-br from-green-400 to-green-600' },
+      '유리': { icon: '🍾', color: 'bg-gradient-to-br from-cyan-400 to-cyan-600' },
+      '금속': { icon: '🥫', color: 'bg-gradient-to-br from-yellow-400 to-yellow-600' },
+      '비닐': { icon: '🛍️', color: 'bg-gradient-to-br from-purple-400 to-purple-600' },
+      '음식물': { icon: '🍌', color: 'bg-gradient-to-br from-orange-400 to-orange-600' },
+      '일반쓰레기': { icon: '🗑️', color: 'bg-gradient-to-br from-gray-400 to-gray-600' },
+    };
+    
     Object.entries(regionalData.items).forEach(([itemName, itemData]) => {
-      const iconData = iconMap[itemName] || { icon: '�', color: 'bg-gradient-to-br from-gray-400 to-gray-600' };
+      const iconData = iconMap[itemName] || { icon: '📦', color: 'bg-gradient-to-br from-gray-400 to-gray-600' };
       schedule.push({
         type: itemName,
         day: itemData.days.join(', '),
