@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { getRegions, getDistricts, getDongs } from '@/data/regionHierarchy';
 
 interface LocationData {
   region: string;
@@ -27,6 +28,16 @@ export default function LocationSettings() {
   const [schedule, setSchedule] = useState<RecyclingSchedule | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [hasLocation, setHasLocation] = useState(false);
+  
+  // 드롭다운 옵션
+  const [regions, setRegions] = useState<string[]>([]);
+  const [districts, setDistricts] = useState<string[]>([]);
+  const [dongs, setDongs] = useState<string[]>([]);
+
+  // 컴포넌트 마운트 시 지역 목록 로드
+  useEffect(() => {
+    setRegions(getRegions());
+  }, []);
 
   // 로컬스토리지에서 위치 정보 불러오기
   useEffect(() => {
@@ -35,8 +46,45 @@ export default function LocationSettings() {
       const parsed = JSON.parse(savedLocation);
       setLocation(parsed);
       setHasLocation(!!parsed.dong);
+      
+      // 저장된 위치가 있으면 드롭다운 옵션 로드
+      if (parsed.region) {
+        setDistricts(getDistricts(parsed.region));
+      }
+      if (parsed.region && parsed.district) {
+        setDongs(getDongs(parsed.region, parsed.district));
+      }
     }
   }, []);
+
+  // 시/도 변경 시
+  const handleRegionChange = (newRegion: string) => {
+    setLocation({
+      region: newRegion,
+      district: '',
+      dong: '',
+    });
+    setDistricts(getDistricts(newRegion));
+    setDongs([]);
+  };
+
+  // 시/군/구 변경 시
+  const handleDistrictChange = (newDistrict: string) => {
+    setLocation(prev => ({
+      ...prev,
+      district: newDistrict,
+      dong: '',
+    }));
+    setDongs(getDongs(location.region, newDistrict));
+  };
+
+  // 동/읍/면 변경 시
+  const handleDongChange = (newDong: string) => {
+    setLocation(prev => ({
+      ...prev,
+      dong: newDong,
+    }));
+  };
 
   const saveLocation = () => {
     if (!location.region || !location.district || !location.dong) {
@@ -90,27 +138,15 @@ export default function LocationSettings() {
                 </label>
                 <select
                   value={location.region}
-                  onChange={(e) => setLocation({ ...location, region: e.target.value })}
+                  onChange={(e) => handleRegionChange(e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="">선택하세요</option>
-                  <option value="서울특별시">서울특별시</option>
-                  <option value="경기도">경기도</option>
-                  <option value="인천광역시">인천광역시</option>
-                  <option value="부산광역시">부산광역시</option>
-                  <option value="대구광역시">대구광역시</option>
-                  <option value="광주광역시">광주광역시</option>
-                  <option value="대전광역시">대전광역시</option>
-                  <option value="울산광역시">울산광역시</option>
-                  <option value="세종특별자치시">세종특별자치시</option>
-                  <option value="강원특별자치도">강원특별자치도</option>
-                  <option value="충청북도">충청북도</option>
-                  <option value="충청남도">충청남도</option>
-                  <option value="전북특별자치도">전북특별자치도</option>
-                  <option value="전라남도">전라남도</option>
-                  <option value="경상북도">경상북도</option>
-                  <option value="경상남도">경상남도</option>
-                  <option value="제주특별자치도">제주특별자치도</option>
+                  {regions.map((region) => (
+                    <option key={region} value={region}>
+                      {region}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -118,26 +154,42 @@ export default function LocationSettings() {
                 <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1 xs:mb-2">
                   시/군/구
                 </label>
-                <input
-                  type="text"
+                <select
                   value={location.district}
-                  onChange={(e) => setLocation({ ...location, district: e.target.value })}
-                  placeholder="예: 강남구"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
+                  onChange={(e) => handleDistrictChange(e.target.value)}
+                  disabled={!location.region}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                >
+                  <option value="">
+                    {location.region ? '선택하세요' : '시/도를 먼저 선택하세요'}
+                  </option>
+                  {districts.map((district) => (
+                    <option key={district} value={district}>
+                      {district}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
                 <label className="block text-xs xs:text-sm font-medium text-gray-700 mb-1 xs:mb-2">
                   동/읍/면
                 </label>
-                <input
-                  type="text"
+                <select
                   value={location.dong}
-                  onChange={(e) => setLocation({ ...location, dong: e.target.value })}
-                  placeholder="예: 역삼동"
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
+                  onChange={(e) => handleDongChange(e.target.value)}
+                  disabled={!location.district}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                >
+                  <option value="">
+                    {location.district ? '선택하세요' : '시/군/구를 먼저 선택하세요'}
+                  </option>
+                  {dongs.map((dong) => (
+                    <option key={dong} value={dong}>
+                      {dong}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
