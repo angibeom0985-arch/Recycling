@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 
 interface NotificationSetting {
-  day: number;
+  days: number[]; // 복수 요일 선택 가능 (교대근무 지원)
   time: string;
   enabled: boolean;
   label: string;
@@ -24,7 +24,7 @@ export default function NotificationSettings() {
 
   const addNotification = () => {
     const newNotification: NotificationSetting = {
-      day: 1,
+      days: [1], // 기본값: 월요일
       time: '20:00',
       enabled: true,
       label: '분리수거',
@@ -37,6 +37,24 @@ export default function NotificationSettings() {
   const updateNotification = (index: number, field: keyof NotificationSetting, value: any) => {
     const updated = [...notifications];
     updated[index] = { ...updated[index], [field]: value };
+    setNotifications(updated);
+    localStorage.setItem('notifications', JSON.stringify(updated));
+  };
+
+  const toggleDay = (index: number, day: number) => {
+    const updated = [...notifications];
+    const currentDays = updated[index].days;
+    
+    if (currentDays.includes(day)) {
+      // 이미 선택된 요일이면 제거 (단, 최소 1개는 유지)
+      if (currentDays.length > 1) {
+        updated[index].days = currentDays.filter(d => d !== day);
+      }
+    } else {
+      // 선택되지 않은 요일이면 추가
+      updated[index].days = [...currentDays, day].sort();
+    }
+    
     setNotifications(updated);
     localStorage.setItem('notifications', JSON.stringify(updated));
   };
@@ -111,24 +129,37 @@ export default function NotificationSettings() {
                             className="w-full px-2 xs:px-3 py-1 xs:py-1.5 text-xs xs:text-sm border border-gray-300 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                           />
                           
-                          <div className="flex gap-2">
-                            <select
-                              value={notification.day}
-                              onChange={(e) => updateNotification(index, 'day', Number(e.target.value))}
-                              className="flex-1 px-2 py-1.5 text-xs xs:text-sm border border-gray-300 rounded focus:ring-2 focus:ring-orange-500"
-                            >
-                              {days.map((day, i) => (
-                                <option key={i} value={i}>
-                                  매주 {day}요일
-                                </option>
+                          {/* 요일 선택 (교대근무 지원) */}
+                          <div className="space-y-2">
+                            <p className="text-[10px] xs:text-xs text-gray-600 font-medium">
+                              📅 알림받을 요일 선택 (복수 선택 가능)
+                            </p>
+                            <div className="grid grid-cols-7 gap-1">
+                              {days.map((day, dayIndex) => (
+                                <button
+                                  key={dayIndex}
+                                  type="button"
+                                  onClick={() => toggleDay(index, dayIndex)}
+                                  className={`
+                                    px-1 py-1.5 text-[10px] xs:text-xs font-medium rounded transition-all
+                                    ${notification.days.includes(dayIndex)
+                                      ? 'bg-orange-500 text-white shadow-md'
+                                      : 'bg-gray-200 text-gray-600 hover:bg-gray-300'}
+                                  `}
+                                >
+                                  {day}
+                                </button>
                               ))}
-                            </select>
-                            
+                            </div>
+                          </div>
+                          
+                          <div className="flex gap-2 items-center">
+                            <span className="text-[10px] xs:text-xs text-gray-600">⏰</span>
                             <input
                               type="time"
                               value={notification.time}
                               onChange={(e) => updateNotification(index, 'time', e.target.value)}
-                              className="px-2 py-1.5 text-xs xs:text-sm border border-gray-300 rounded focus:ring-2 focus:ring-orange-500"
+                              className="flex-1 px-2 py-1.5 text-xs xs:text-sm border border-gray-300 rounded focus:ring-2 focus:ring-orange-500"
                             />
                           </div>
                         </div>

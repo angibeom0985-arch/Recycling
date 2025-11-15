@@ -1,6 +1,7 @@
 {
   "name": "분리수거 알리미",
   "short_name": "분리수거",
+  "version": "2.0.4",
   "description": "지역 분리수거 일정을 쉽게 확인하고 알림을 받아보세요",
   "start_url": "/",
   "display": "standalone",
